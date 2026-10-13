@@ -1,0 +1,47 @@
+version: '3.8'
+services: 
+    consul:
+        image: hashicorp/consul:latest
+        container_name: consul-server
+        ports:
+            - "8500:8500"
+        command: "agent -dev -client=0.0.0.0"
+
+    node1:
+        build: .
+        container_name: raft-node1
+        environment:
+            - ASPNETCORE_URLs=http://+:5001
+            - NODE_ID=node1
+            - NODE_PORT=5001
+            - CONSUL_URL=http://consul:8500
+        ports:
+            - "5001:5001"
+        depends_on:
+            - consul
+
+    node2:
+        build: .
+        container_name: raft-node2
+        environment:
+            - ASPNETCORE_URLS=http://+:5002
+            - NODE_ID=node2
+            - NODE_PORT=5002
+            - CONSUL_URL=http://consul:8500
+        ports:
+            - "5002:5002"
+        depends_on:
+            - consul
+
+    node3:
+        build: .
+        container_name: raft-node3
+        environment:
+            - ASPNETCORE_URLS=http://+:5003
+            - NODE_ID=node3
+            - NODE_PORT=5003
+            - CONSUL_URL=http://consul:8500
+        ports:
+            - "5003:5003"
+        depends_on:
+            - consul
